@@ -58,6 +58,10 @@ public class Main {
     }
 
 
+
+    
+
+
     public static IntLists2 indexProducer(String oneElementString) {
         String string = oneElementString;
         List<Integer> capitalsIndex = new ArrayList<>();
