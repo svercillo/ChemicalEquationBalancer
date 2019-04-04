@@ -1,43 +1,16 @@
-package com.company;
 
 import java.util.*;
 
-
 public class Main {
-    public static void main(String[] args) {
 
-    }
     public static class StringAndInteger {
-        public String elements;
-        public int elementNum;
+        public String element;
+        public Integer elementNum;
 
         public StringAndInteger(String elements,
-                                int elementNum) {
-            this.elements = elements;
+                                Integer elementNum) {
+            this.element = elements;
             this.elementNum = elementNum;
-        }
-    }
-    public static class Ranker {
-        public StringAndInteger stringAndInteger;
-        public int moleculeNum;
-
-        public Ranker(StringAndInteger stringAndInteger,
-                      int moleculeNum) {
-            this.stringAndInteger = stringAndInteger;
-            this.moleculeNum = moleculeNum;
-        }
-    }
-
-    public static class MatrixRow  {
-        public String elements;
-        public int elementNum;
-        public  int moleNum;
-        public MatrixRow (String elements,
-                          int elementNum,
-                          int moleNum) {
-            this.elements = elements;
-            this.elementNum = elementNum;
-            this.moleNum = moleNum;
         }
     }
 
@@ -52,230 +25,171 @@ public class Main {
         }
     }
 
-    public static Boolean isCapital(char character) {
-        if (Character.isUpperCase(character)) {
-            return true;
+    //    C2H6 + O2 --> CO2 + H2O
+    public static List<String> uniqueElement(List<String> elementsList, String[] rxnArr) {
+        List<String> uniqueElements = new ArrayList<>();
+        for (int j = 0; j < rxnArr.length; j++) {
+            String string = elementsList.get(j);
+            List<String> elementwNumList = elementwNumParser(string, indexProducer(string).capitalsIndex);
+            for (int i = 0; i < elementwNumList.size(); i++) {
+                String element = elementInfoOneMole(elementwNumList.get(i)).element;
+                if (!uniqueElements.contains(element)) {
+                    uniqueElements.add(element);
+                }
+            }
         }
-        return false;
+        Collections.sort(uniqueElements);
+        return (uniqueElements);
     }
 
-    public static Boolean isDigit(char character) {
-        if (Character.isDigit(character)) {
-            return true;
+    public static List<String> elementStrings(String[] rxnStrings, String[] prodStrings) {
+
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < rxnStrings.length; i++) {
+            if (rxnStrings[i] != null)
+                strings.add(rxnStrings[i]);
         }
-        return false;
+        for (int i = 0; i < prodStrings.length; i++) {
+            if (rxnStrings[i] != null)
+
+                strings.add(prodStrings[i]);
+        }
+        return strings;
     }
 
-    //    premise, there will always be a number before the first element, all elements start with a capital,
-//    and all od the elements
-    public static IntLists2 indexProducer(String string) {
+
+    public static IntLists2 indexProducer(String oneElementString) {
+        String string = oneElementString;
         List<Integer> capitalsIndex = new ArrayList<>();
         List<Integer> coefficientIndex = new ArrayList<>();
-        for (int i = 0; i < string.length(); i++) {
-            String iter = Character.toString(string.charAt(i));
-            if (Character.isUpperCase(iter.charAt(i))) {
+        for (int i = 0; i < oneElementString.length(); i++) {
+            if (Character.isUpperCase(string.charAt(i)))
                 capitalsIndex.add(i);
-            }
-            if (Character.isDigit(iter.charAt(i))) {
+            if (Character.isDigit(string.charAt(i)))
                 coefficientIndex.add(i);
-            }
-            if (capitalsIndex.size() < 1) {
-                System.out.println("ERROR INPPUT INVALID, input in proper format with capital letters");
-            }
         }
         IntLists2 holder = new IntLists2(capitalsIndex, coefficientIndex);
         return holder;
     }
 
     public static List<String> elementwNumParser(String string, List<Integer> capitalsIndex) {
-        List<String> elementwNum = new ArrayList<>();
-
+        List<String> elementwNumList = new ArrayList<>();
 
         for (int i = 0; i < capitalsIndex.size(); i++) {
             if (i == capitalsIndex.size() - 1) {
-                elementwNum.add(string.substring(capitalsIndex.get(i)));
+                elementwNumList.add(string.substring(capitalsIndex.get(i)));
             } else {
-                elementwNum.add(string.substring(capitalsIndex.get(i), capitalsIndex.get(i + 1)));
+                elementwNumList.add(string.substring(capitalsIndex.get(i), capitalsIndex.get(i + 1)));
             }
         }
-        return elementwNum;
+        return elementwNumList;
     }
 
-    public static int moleculeNum(String string, List<Integer> capitalIndex) {
-        int moleculeNum = 0;
-        if (capitalIndex.get(0) != 0) {
-            String moleNum = string.substring(0, capitalIndex.get(0));
-            moleculeNum = Integer.parseInt(moleNum);
+    public static StringAndInteger elementInfoOneMole(String elementwNum) {
+        String string = elementwNum;
+        List<Integer> digitIndex = new ArrayList<>();
+        for (int i = 0; i < string.length(); i++) {
+            if (Character.isDigit(string.charAt(i))) {
+                digitIndex.add(i);
+                break;
+            }
+        }
+        if (digitIndex.size() != 0) {
+            String element = string.substring(0, digitIndex.get(0));
+            int elementNum = Integer.valueOf(string.substring(digitIndex.get(0)));
+            StringAndInteger enn = new StringAndInteger(element, elementNum);
+            return enn;
         } else {
-            moleculeNum = 1;
+            String element = string;
+            int elementNum = 1;
+            StringAndInteger enn = new StringAndInteger(element, elementNum);
+            return enn;
         }
-        return moleculeNum;
     }
 
-
-//
-
-    public static StringAndInteger elementAndNumbers(String elementwNum, IntLists2 indexProducer) {
-        String element = null;
-        int elementNum = 0;
-        if (!isCapital(elementwNum.charAt(0))) {
-            System.out.println("PLEASE INPUT DATA IN CORRECT FORMAT");
-        }
-        for (int i = 0; i < elementwNum.length(); i++) {
-            if (isDigit(elementwNum.charAt(i))) {
-                element = elementwNum.substring(0, indexProducer.coefficientIndex.get(i));
-                elementNum = Integer.parseInt(elementwNum.substring(indexProducer.coefficientIndex.get(i)));
-            } else {
-                element = elementwNum;
-                elementNum = 1;
+    public static List<String> concatenatedList(List<List<String>> singleRxnElewNumsList) {
+        List<String> concatinatedList = new ArrayList<>();
+        for (int i = 0; i < singleRxnElewNumsList.size(); i++) {
+            for (int j = 0; j < singleRxnElewNumsList.get(i).size(); j++) {
+                concatinatedList.add(singleRxnElewNumsList.get(i).get(j));
             }
         }
-        StringAndInteger enn = new StringAndInteger(element, elementNum);
-        return enn;
-
+        return concatinatedList;
     }
-
-    public static String[] rxnStrings(){
-        Scanner scanner = new Scanner(System.in);
-        String whole = scanner.nextLine();
-        String[] eqnSplitter = whole.split("-->");
-        String[] rxnSplitter = eqnSplitter[0].split("\\ + ");
-        return  rxnSplitter;
-    }
-    public static String[] prodStrings(){
-        Scanner scanner = new Scanner(System.in);
-        String whole = scanner.nextLine();
-        String[] eqnSplitter = whole.split("-->");
-        String[] prodSplitter = eqnSplitter[0].split("\\ + ");
-        return  prodSplitter;
-    }
-
-    public static List<StringAndInteger> elementParser (String singleRxnMolecule) {
-        String string = singleRxnMolecule;
-        List<String> elementwNumList = elementwNumParser(string, indexProducer(string).capitalsIndex);
-        List<StringAndInteger> elementInfo = new ArrayList<>();
-        List<String> uniqueElements = new ArrayList<>();
-
-        for (int i = 0; i < elementwNumList.size(); i++) {
-            String element = elementAndNumbers(elementwNumList.get(i), indexProducer(elementwNumList.get(i))).elements;
-            int elementNum = elementAndNumbers(elementwNumList.get(i), indexProducer(elementwNumList.get(i))).elementNum;
-            StringAndInteger si = new StringAndInteger(element, elementNum);
-            elementInfo.add(si);
-            if (uniqueElements.indexOf(element) == 0)
-                uniqueElements.add(element);
-        }
-        return elementInfo;
-    }
-    //
-    private static List<String> uniqueElement (String[] rxnArr) {
-        List<String> uniqueElements = new ArrayList<>();
-        for (int j=0; j<rxnArr.length; j++) {
-            String string = rxnArr[j];
-            List<String> elementwNumList = elementwNumParser(string, indexProducer(string).capitalsIndex);
-            for (int i = 0; i < elementwNumList.size(); i++) {
-                String element = elementAndNumbers(elementwNumList.get(i), indexProducer(elementwNumList.get(i))).elements;
-                if (uniqueElements.indexOf(element) == 0)
-                    uniqueElements.add(element);
+    public static Boolean isUniqueElement (List<StringAndInteger> rankList, StringAndInteger elementInfo) {
+        List<Integer> intList = new ArrayList<>();
+        for (StringAndInteger s : rankList){
+            if(elementInfo.element.equals(s.element)){
+                intList.add(0);
             }
         }
-        return uniqueElements;
+        if (intList.size() == 0){
+            return true;
+        }
+        return false;
     }
 
-    public static List<Ranker> rankList(List<String> uniqueElements, List<StringAndInteger>elementInfo1) {
-        List<Ranker> rankList = new ArrayList<>();
-        for (int j=0; j<uniqueElements.size(); j++) {
-            for (int i = 0; i < elementInfo1.size(); i++){
-                if (elementInfo1.get(i).elements.equals(uniqueElements.get(j))){
-                    Ranker rank = new Ranker(elementInfo1.get(i), j);
-                    rankList.add(rank);
+    public static List<List<StringAndInteger>> rankListEachMole(List<String> elementStrings) {
+        List<List<StringAndInteger>> rankListEachMole = new ArrayList<>();
+//        String == "C2H6"
+        for (String string : elementStrings) {
+            List<Integer> capitalIndex = indexProducer(string).capitalsIndex;
+//            singleRxnElewNums.get(O) == C2
+            List<String> singleRxnElewNums = elementwNumParser(string, capitalIndex);
+            Collections.sort(singleRxnElewNums);
+            List <StringAndInteger> elementInfoList = new ArrayList<>();
+            for (String s : singleRxnElewNums){
+                StringAndInteger elementInfo = elementInfoOneMole(s);
+                elementInfoList.add(elementInfo);
+            }
+            rankListEachMole.add(elementInfoList);
+        }
+        return rankListEachMole;
+    }
+
+    //    Needs to be interated through rankList
+    public static List<StringAndInteger> zeroPutter (List<StringAndInteger> rankList, List<String> uniqueElements){
+        List<StringAndInteger> zeroPutter = new ArrayList<>();
+        Map<Integer, StringAndInteger> hashMap = new HashMap<>();
+        for (int i=0; i<uniqueElements.size(); i++){
+            List<StringAndInteger> elementInfoList = new ArrayList<>();
+            for (StringAndInteger si : rankList){
+                Boolean s = isUniqueElement(rankList, si);
+                if(si.element.equals(uniqueElements.get(i)) && isUniqueElement(elementInfoList, si)){
+                    elementInfoList.add(si);
+                    hashMap.put(i, si);
                 }
             }
         }
-        return rankList;
-    }
-
-    public static List<Ranker> zeroPutterAtEnd (List<Ranker> rankList, List<String> uniqueElements) {
-//            check if last unique element is present
-        if (rankList.get(rankList.size()-1).stringAndInteger.elements != uniqueElements.get(uniqueElements.size()-1)) {
-            List<Ranker> zeroAddedRankList = new ArrayList<>();
-            for (int i=0; i<uniqueElements.size()-rankList.size(); i++) {
-                StringAndInteger s = new StringAndInteger(null, 0);
-                Ranker rank = new Ranker(s, rankList.get(rankList.size()-1).moleculeNum);
-                rankList.add(rank);
+        for (int i=0; i<uniqueElements.size(); i++){
+            if (hashMap.containsKey(i)){
+                zeroPutter.add(i, hashMap.get(i));
+            }else{
+                StringAndInteger empty = new StringAndInteger(uniqueElements.get(i), 0);
+                zeroPutter.add(empty);
             }
-            return rankList;
         }
-        return rankList;
-
-    }
-//              MAKE SURE THIS CONTAINS THE REACTANTS AND THE PRODUCTS
-    public static List<Ranker> zeroPutterAtBeginning (List<Ranker> rankListZerosAtEnd, List<String> uniqueElements) {
-        List<Ranker> rankList = rankListZerosAtEnd;
-//               check if last unique element is present
-        if (rankList.get(rankList.size()-1).stringAndInteger.elements != uniqueElements.get(uniqueElements.size()-1)) {
-            List<Ranker> zeroAddedRankList = new ArrayList<>();
-            for (int i=0; i<uniqueElements.size()-rankList.size(); i++) {
-                StringAndInteger s = new StringAndInteger(null, 0);
-
-                Ranker rank = new Ranker(s, rankList.get(0).moleculeNum);
-                zeroAddedRankList.add(rank);
-            }
-            for (Ranker s: rankList) {
-                zeroAddedRankList.add(s);
-            }
-            return zeroAddedRankList;
-        }
-        return rankList;
+        return zeroPutter;
     }
 
-    public static double[][] matrix(List<Ranker> fromzeroPutterAtBeginning, List<String> uniqueElements, String[] rxnStrings, String[] prodStrings){
-        List<Ranker> rankList = fromzeroPutterAtBeginning;
-        int m = uniqueElements.size();
-
-//        indexed from 0????
-
-
-        int n = rxnStrings.length + prodStrings.length-1;
+    public static double[][] matrix(List<List<StringAndInteger>> rankList) {
+//         3
+        int m = rankList.get(0).size();
+//         4
+        int n = rankList.size();
         double[][] matrix = new double[m][n];
-//        For each column
-        for (int j=0; j<n; j++){
-//            For each row in that given column
-            for(int i=0; i<m; i++){
-                matrix[i][j] = rankList.get(i).stringAndInteger.elementNum;
+        List<List<StringAndInteger>> columnList = rankList;
+        //        For each column
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                matrix[i][j] = rankList.get(j).get(i).elementNum;
             }
         }
         return matrix;
     }
 
-
-    public static List<Double> balancedNumbers (double[][] rref, List<String> uniqueElements, String[] rxnStrings, String[] prodStrings) {
-        int m = uniqueElements.size();
-        int n = rxnStrings.length + prodStrings.length - 1;
-        List<Double> doubleList = new ArrayList<>();
-        int muliplier =0;
-        List<Double> balancedNums = new ArrayList<>();
-        for (int i = 0; i < m; i++)
-            doubleList.add(rref[i][n]);
-
-        for (int w = 2; w < 11; w++) {
-            List<Boolean> bool = new ArrayList<>();
-            for (int i = 0; i < doubleList.size(); i++) {
-                double num = doubleList.get(i);
-                if (w * num % 1 == 0) bool.add(true);
-            }
-            if (bool.size() == uniqueElements.size()) {
-                muliplier = w;
-                break;
-            }
-        }
-        for (int i = 0; i < doubleList.size(); i++) {
-            double value = doubleList.get(i)*muliplier;
-            balancedNums.add(value);
-        }
-        return balancedNums;
-    }
-
-    public static double[][] rref(double[][] matrix) {
+    //        C2H6 + O2 --> CO2 + H2O
+    private static double[][] rref(double[][] matrix) {
         double[][] rref = new double[matrix.length][];
         for (int i = 0; i < matrix.length; i++)
             rref[i] = Arrays.copyOf(matrix[i], matrix[i].length);
@@ -309,148 +223,88 @@ public class Main {
         return rref;
     }
 
-
-
-
-
-
-
-
-
-
-//
-//
-//    public static List<MatrixRow> rowList (List<Ranker> zeroPutterAtBeginning) {
-//        String[] rxnArr = rxnStrings();
-//        String[] prodArr = prodStrings();
-//        List<String> uniqueElements = uniqueElement(rxnArr);
-//        List<MatrixRow> rowList = new ArrayList<>();
-//        List<Ranker> rankList = zeroPutterAtBeginning;
-//        for (int i=0; )
-//
-//
-//
-//
-//    }
-
-//
-//
-//    public static List<MatrixRow> columnMaker (List<MatrixRow> rowList) {
-//        List<String> uniqueElements = elementParser().uniqueElements;
-//        for (int i=0; i<rowList.size(); i++) {
-//
+    public static List<Double> balancedNumbers (double[][] rref, List<String> uniqueElements, String[] rxnStrings, String[] prodStrings) {
+//        List<Double> rawCoefficientList = new ArrayList<>();
+//        for (int j=0; j<rref.length; j++){
+//            for (int i=0; i<rref[j].length; i++)
+//                rawCoefficientList.add(rref[][]);
 //        }
-//
-//
-//
-//
-//    }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//        String[] rxnSplitter = rxnStrings();
-//        List<String> rxnElementsList = new ArrayList<>();
-//        List<Integer> rxnElementNum = new ArrayList<>();
-//        List<Integer> rxnMoleculePlacement = new ArrayList<>();
-//        List<String> strings = new ArrayList<>();
-//        static List<String> uniqueElements = new ArrayList<>();
-//        Map<Integer, Map<Integer, String>> moleculeMap = new HashMap<>();
-//        Map<Integer, String> elementMap = new HashMap<>();
-//        for (int j = 0; j < rxnSplitter.length; j++) {
-//            String string = rxnSplitter[j];
-//            strings.add(string);
-//            List<Integer> capitalIndex = indexProducer(string).capitalsIndex;
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//                List<Integer> elementNumMolNum = new ArrayList<>();
-//                elementNumMolNum.add(j, elementNum);
-//                rxnElementsList.add(element);
-//                rxnElementNum.add(elementNum);
-//                rxnMoleculePlacement.add(j);
-//                if (uniqueElements.indexOf(element) == 0)
-//                    uniqueElements.add(element);
-//            }
-//            for (int i=0; i<rxnElementNum.size(); i++){
-//                if ()
-//            }
-//        }
-//        for (int i=0; i<uniqueElements.size(); i++) {
-//            elementMap.put(i, uniqueElements.get(i));
-//        }
-//
-//
-//    }
-//
-//
-//    public static ColossalMap colossalMap() {
-//        Scanner scanner = new Scanner(System.in);
-//        String whole = scanner.nextLine();
-//        String[] eqnSplitter = whole.split("-->");
-//        String[] rxnSplitter = eqnSplitter[0].split("\\ + ");
-//        String[] prodSplitter = eqnSplitter[1].split("\\ + ");
-//        List<String> rxnElementsList = new ArrayList<>();
-//        List<String> prodElementsList = new ArrayList<>();
-//        List<Integer> rxnElementNum = new ArrayList<>();
-//        List<Integer> prodElementNum = new ArrayList<>();
-//        List<Integer> rxnMoleculePlacement = new ArrayList<>();
-//        List<Integer> prodMoleculePlacement = new ArrayList<>();
-//        Map<Integer, String> elementMap = new HashMap<>();
-//        List<String> strings = new ArrayList<>();
-//        List<String> uniqueElements = new ArrayList<>();
-//
-//        for (int j = 0; j < rxnSplitter.length; j++) {
-//            String string = rxnSplitter[j];
-//            strings.add(string);
-//            List<Integer> capitalIndex = indexProducer(string).capitalsIndex;
-//            List<String> elementwNumList = elementwNumParser(string, capitalIndex);
-//
-//
-//        }
-//        for (int i=0; i<uniqueElements.size(); i++) {
-//            elementMap.put(i, uniqueElements.get(i));
-//        }
-//
-//        for (int j = 0; j < prodSplitter.length; j++) {
-//            String string = prodSplitter[j];
-//            List<Integer> capitalIndex = indexProducer(string).capitalsIndex;
-//            List<String> elementwNumList = elementwNumParser(string, capitalIndex);
-//            for (int i = 0; i < elementwNumList.size(); i++) {
-//                String element = elementAndNumbers(elementwNumList.get(i), indexProducer(elementwNumList.get(i))).elements;
-//                int elementNum = elementAndNumbers(elementwNumList.get(i), indexProducer(elementwNumList.get(i))).elementNum;
-//                List<Integer> elementNumMolNum = new ArrayList<>();
-//                elementNumMolNum.add(j, elementNum);
-//                prodElementsList.add(element);
-//                prodElementNum.add(elementNum);
-//                prodMoleculePlacement.add(j);
-//                if (uniqueElements.indexOf(element) ==0)
-//                    uniqueElements.add(element);
-//            }
-//        }
-//        ColossalMap holder = new ColossalMap(rxnElementsList, prodElementsList, rxnElementNum,
-//                prodElementNum, rxnMoleculePlacement, prodMoleculePlacement, elementMap);
-//        return holder;
+
+
+
+
+
+        int m = uniqueElements.size()-1;
+        int n = rxnStrings.length + prodStrings.length - 1;
+        List<Double> doubleList = new ArrayList<>();
+        int muliplier =0;
+        List<Double> balancedNums = new ArrayList<>();
+        for (int i = 0; i < m; i++)
+            doubleList.add(rref[i][n]);
+
+        for (int w = 2; w < 11; w++) {
+            List<Boolean> bool = new ArrayList<>();
+            for (int i = 0; i < doubleList.size(); i++) {
+                double num = doubleList.get(i);
+                if (w * num % 1 == 0) bool.add(true);
+            }
+            if (bool.size() == uniqueElements.size()) {
+                muliplier = w;
+                break;
+            }
+        }
+        for (int i = 0; i < doubleList.size(); i++) {
+            double value = doubleList.get(i)*muliplier;
+            balancedNums.add(value);
+        }
+        return balancedNums;
+    }
+
+//        C2H6 + O2 --> CO2 + H2O
+//        O2H4 + C2H6 + O2 --> CO2 + H2O
+
+    public static void main(String[] args) {
+//        receiving and splitting data into elements
+        Scanner scanner = new Scanner(System.in);
+        String whole = scanner.nextLine();
+        String[] eqnSplitter = whole.split(" --> ");
+        String[] rxnStrings = eqnSplitter[0].split(" \\+ ");
+        String[] prodStrings = eqnSplitter[1].split(" \\+ ");
+        List<String> elementStrings = elementStrings(rxnStrings, prodStrings);
+        List<String> uniqueElements = uniqueElement(elementStrings, rxnStrings);
+        List<List<StringAndInteger>> rankListEachMole = rankListEachMole(elementStrings);
+        List<List<StringAndInteger>> rankList = new ArrayList<>();
+        for (List<StringAndInteger> siList : rankListEachMole){
+            rankList.add(zeroPutter(siList, uniqueElements));
+        }
+        double[][] rref = rref(matrix(rankList));
+
+        List<Double> balancedEquation = balancedNumbers(rref,uniqueElements,rxnStrings,prodStrings);
+        List <Double> f = balancedEquation;
+
+        int fs = 0;
+    }
+
 }
+
+//            List<StringAndInteger> rankListHolder = new ArrayList<>();
+//            Map<String, StringAndInteger> map = new HashMap<>();
+//            for (int i=0; i<uniqueElements.size(); i++) {
+//                for (String s : singleRxnElewNums) {
+////                StringAndInteger elementInfo = elementInfoOneMole(s);
+////                    if (elementInfo.element.equals(uniqueElements.get(i)) && isUniqueElement(rankListHolder, elementInfo)) {
+////                        rankListHolder.add(elementInfo);
+////                        map.put(elementInfo.element, elementInfo);
+////                    }
+//                }
+//            }
+//            List<StringAndInteger> rankList = new ArrayList<>();
+//            for (int i=0; i<uniqueElements.size(); i++){
+//                if(map.keySet().contains(uniqueElements.get(i))){
+//                    StringAndInteger sAndI = map.get(i);
+//                    rankList.add(i,sAndI);
+//                }
+//                StringAndInteger si = new StringAndInteger(uniqueElements.get(i), 0);
+//                rankList.add(si);
+//            }
+//            rankListEachMole.add(rankListHolder);
