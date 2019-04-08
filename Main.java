@@ -1,8 +1,11 @@
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class Main {
-
+    private static final Logger LOG = Logger.getLogger(Main.class.getName());
     public static class StringAndInteger {
         public String element;
         public Integer elementNum;
@@ -56,10 +59,6 @@ public class Main {
         }
         return strings;
     }
-
-
-
-    
 
 
     public static IntLists2 indexProducer(String oneElementString) {
@@ -223,45 +222,74 @@ public class Main {
             }
             r++;
         }
-
         return rref;
     }
 
-    public static List<Double> balancedNumbers (double[][] rref, List<String> uniqueElements, String[] rxnStrings, String[] prodStrings) {
-//        List<Double> rawCoefficientList = new ArrayList<>();
-//        for (int j=0; j<rref.length; j++){
-//            for (int i=0; i<rref[j].length; i++)
-//                rawCoefficientList.add(rref[][]);
-//        }
-
-
-
-
-
-        int m = uniqueElements.size()-1;
-        int n = rxnStrings.length + prodStrings.length - 1;
-        List<Double> doubleList = new ArrayList<>();
-        int muliplier =0;
-        List<Double> balancedNums = new ArrayList<>();
-        for (int i = 0; i < m; i++)
-            doubleList.add(rref[i][n]);
-
-        for (int w = 2; w < 11; w++) {
-            List<Boolean> bool = new ArrayList<>();
-            for (int i = 0; i < doubleList.size(); i++) {
-                double num = doubleList.get(i);
-                if (w * num % 1 == 0) bool.add(true);
+    public static List<Integer> balancedNumbers (double[][] rref, List<String> uniqueElements, String[] rxnStrings, String[] prodStrings) {
+        DecimalFormat df = new DecimalFormat("#.#####");
+        df.setRoundingMode(RoundingMode.HALF_UP);
+        List<Double> rawCoefficientList = new ArrayList<>();
+//        rref.length gives the number of ROWS
+        for (int i=0; i<rref.length; i++){
+//            rref[j].length gives the number of COLUMNS
+                rawCoefficientList.add(rref[i][rref[i].length-1]);
+        }
+        int lowestPossibleCount =0;
+        for (int count=1; count<33; count++) {
+            List<Boolean> isIntegerList = new ArrayList<>();
+            List<Double> doubleList = new ArrayList<>();
+            for (Double d : rawCoefficientList) {
+                double doub = Double.parseDouble(df.format(d * count));
+                if (doub % 1 == 0) {
+                    isIntegerList.add(true);
+                }
             }
-            if (bool.size() == uniqueElements.size()) {
-                muliplier = w;
+            if (isIntegerList.size()==rawCoefficientList.size()){
+                lowestPossibleCount = count;
                 break;
             }
         }
-        for (int i = 0; i < doubleList.size(); i++) {
-            double value = doubleList.get(i)*muliplier;
-            balancedNums.add(value);
+//        if count != 0 || null;
+        List<Integer> balancedNums = new ArrayList<>();
+        for (Double d : rawCoefficientList){
+            int balancedInt = Math.abs((int) Math.round(d*lowestPossibleCount));
+            balancedNums.add(balancedInt);
         }
         return balancedNums;
+    }
+
+    public static String balancedEquation(List<String> elementStrings, List<Integer> balancedNumbers){
+        int reactantsIndex = 0;
+        int count =-1;
+        for (int i : balancedNumbers) {
+            count++;
+            if (i<0) {
+                break;
+            }
+        }
+        List<String> rxnElements = new ArrayList<>();
+        List<String> prodElements = new ArrayList<>();
+        for (int i=0; i<elementStrings.size(); i++ ){
+            if ( i< count){
+                rxnElements.add(elementStrings.get(i));
+            } else{
+                prodElements.add(elementStrings.get(i));
+            }
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        int commonInt =0;
+        for (int i=0; i<rxnElements.size(); i++) {
+            stringBuilder.append(balancedNumbers.get(i) + " " + rxnElements.get(i) + " + ");
+            commonInt=i;
+        }
+        stringBuilder.delete(stringBuilder.lastIndexOf("+ "), stringBuilder.length());
+        stringBuilder.append(" ---> ");
+        for (int i=0; i<prodElements.size(); i++) {
+            stringBuilder.append(balancedNumbers.get(i+commonInt) + " " + prodElements.get(i) + " + ");
+        }
+        stringBuilder.delete(stringBuilder.lastIndexOf("+ "), stringBuilder.length());
+        String balancedEqn = stringBuilder.toString();
+        return balancedEqn;
     }
 
 //        C2H6 + O2 --> CO2 + H2O
@@ -283,12 +311,10 @@ public class Main {
         }
         double[][] rref = rref(matrix(rankList));
 
-        List<Double> balancedEquation = balancedNumbers(rref,uniqueElements,rxnStrings,prodStrings);
-        List <Double> f = balancedEquation;
-
-        int fs = 0;
+        List<Integer> balancedEquation = balancedNumbers(rref,uniqueElements,rxnStrings,prodStrings);
+        String s = balancedEquation(elementStrings, balancedEquation);
+        System.out.println(s);
     }
-
 }
 
 //            List<StringAndInteger> rankListHolder = new ArrayList<>();
