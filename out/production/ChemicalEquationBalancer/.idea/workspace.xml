@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://C:/maven dependencies/untitled1/src/com/company/Main.java" description="import java.lang.reflect.Array;" line="2" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="6ce17f48-6b9a-4746-b52f-52260965ff02" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/APIs$IntLists2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main$IntLists2.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/APIs$StringAndInteger.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main$StringAndInteger.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/APIs.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Beta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main$IntLists2.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main$IntLists2.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main$StringAndInteger.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main$StringAndInteger.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Prototype" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/ChemicalEquationBalancer/Prototype" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -22,13 +22,19 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/chemicalEquationBalancer$Main.ic" NAME="Main Coverage Results" MODIFIED="1554659995309" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
+  <component name="FavoritesManager">
+    <favorites_list name="chemicalEquationBalancer" />
+  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="163">
-              <caret line="242" column="44" lean-forward="true" selection-start-line="242" selection-start-column="44" selection-end-line="242" selection-end-column="44" />
+            <state relative-caret-position="111">
+              <caret line="240" column="9" selection-start-line="240" selection-start-column="9" selection-end-line="240" selection-end-column="9" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -41,6 +47,21 @@
         <option value="Class" />
       </list>
     </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>uniqueElement</find>
+      <find>whereIsPolyatomic</find>
+      <find>ind</find>
+      <find>unique</find>
+      <find>balancedEquation</find>
+      <find>isUniqueElement</find>
+      <find>rankListEachMole</find>
+      <find>elementInfoOneMole</find>
+      <find>elementwNumParser</find>
+      <find>no2</find>
+      <find>no3</find>
+    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -56,8 +77,9 @@
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="260" />
+    <option name="y" value="5" />
     <option name="width" value="515" />
-    <option name="height" value="280" />
+    <option name="height" value="275" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -65,13 +87,13 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="ProjectPane" />
       <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="ProjectPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1554656830876" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1555343687468" />
     <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RunDashboard">
@@ -125,26 +147,26 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.032214765" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Image Layers" order="2" />
-      <window_info id="Designer" order="3" />
-      <window_info id="UI Designer" order="4" />
-      <window_info id="Capture Tool" order="5" />
-      <window_info id="Favorites" order="6" side_tool="true" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4981685" visible="true" weight="0.020134227" />
+      <window_info id="Image Layers" order="1" />
+      <window_info id="Designer" order="2" />
+      <window_info id="UI Designer" order="3" />
+      <window_info id="Capture Tool" order="4" />
+      <window_info id="Favorites" order="5" sideWeight="0.50183153" side_tool="true" weight="0.020134227" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3286119" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3286119" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49932885" weight="0.3555241" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49932885" weight="0.3286119" />
-      <window_info anchor="bottom" id="Terminal" order="7" sideWeight="0.49932885" weight="0.3286119" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50067115" side_tool="true" weight="0.3286119" />
-      <window_info anchor="bottom" id="Version Control" order="9" sideWeight="0.49932885" weight="0.3286119" />
-      <window_info anchor="bottom" id="Messages" order="10" />
-      <window_info anchor="right" id="Coverage" side_tool="true" weight="0.3295302" />
+      <window_info anchor="bottom" id="Structure" order="2" sideWeight="0.50097466" weight="0.04249292" />
+      <window_info anchor="bottom" id="Run" order="3" weight="0.3286119" />
+      <window_info active="true" anchor="bottom" id="Debug" order="4" sideWeight="0.49932885" visible="true" weight="0.2266289" />
+      <window_info anchor="bottom" id="Cvs" order="5" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="6" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="7" sideWeight="0.49932885" weight="0.3286119" />
+      <window_info anchor="bottom" id="Terminal" order="8" sideWeight="0.49932885" weight="0.3286119" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50067115" side_tool="true" weight="0.3286119" />
+      <window_info anchor="bottom" id="Version Control" order="10" sideWeight="0.49932885" weight="0.3286119" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.3286119" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -153,6 +175,7 @@
       <window_info anchor="right" id="Theme Preview" order="5" />
       <window_info anchor="right" id="Capture Analysis" order="6" />
       <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Coverage" order="8" side_tool="true" weight="0.3295302" />
     </layout>
   </component>
   <component name="XDebuggerManager">
@@ -160,21 +183,33 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Main.java</url>
-          <line>187</line>
+          <line>230</line>
           <properties />
-          <option name="timeStamp" value="2" />
+          <option name="timeStamp" value="107" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Main.java</url>
-          <line>222</line>
+          <line>242</line>
           <properties />
-          <option name="timeStamp" value="3" />
+          <option name="timeStamp" value="108" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/Main.java</url>
-          <line>251</line>
+          <line>276</line>
           <properties />
-          <option name="timeStamp" value="7" />
+          <option name="timeStamp" value="109" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Main.java</url>
+          <line>199</line>
+          <properties />
+          <option name="timeStamp" value="110" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/Main.java</url>
+          <line>224</line>
+          <properties />
+          <option name="timeStamp" value="112" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -194,8 +229,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="163">
-          <caret line="242" column="44" lean-forward="true" selection-start-line="242" selection-start-column="44" selection-end-line="242" selection-end-column="44" />
+        <state relative-caret-position="111">
+          <caret line="240" column="9" selection-start-line="240" selection-start-column="9" selection-end-line="240" selection-end-column="9" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

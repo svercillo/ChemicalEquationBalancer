@@ -4,8 +4,19 @@ import java.text.DecimalFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
+
+/*
+ASSUMPTIONS MADE
+Input must be formatted like this C2H6 + O2 --> CO2 + H2O or like this
+BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
+There may only be one polyatomic ion per molecule
+There are no charges to balance
+Polyatomic elements must be attached to an element such that the charges balance
+ */
 public class Main {
+
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
+
     public static class StringAndInteger {
         public String element;
         public Integer elementNum;
@@ -28,38 +39,18 @@ public class Main {
         }
     }
 
-    //    C2H6 + O2 --> CO2 + H2O
-    public static List<String> uniqueElement(List<String> elementsList, String[] rxnArr) {
-        List<String> uniqueElements = new ArrayList<>();
-        for (int j = 0; j < rxnArr.length; j++) {
-            String string = elementsList.get(j);
-            List<String> elementwNumList = elementwNumParser(string, indexProducer(string).capitalsIndex);
-            for (int i = 0; i < elementwNumList.size(); i++) {
-                String element = elementInfoOneMole(elementwNumList.get(i)).element;
-                if (!uniqueElements.contains(element)) {
-                    uniqueElements.add(element);
-                }
+//    Import this list from python script
+    public static List<String> polyatomicList = Arrays.asList("(NH4)", "(NO2)", "(NO3)", "(NO4)", "(SO3)","(SO4)", "(SO2)", "(OH)");
+
+
+    public static Integer whereIsPolyatomic (String string, List<String> polyatomicElements ) {
+        for(String str: polyatomicElements){
+            if (string.contains(str)){
+                return string.indexOf(str);
             }
         }
-        Collections.sort(uniqueElements);
-        return (uniqueElements);
+        return -1;
     }
-
-    public static List<String> elementStrings(String[] rxnStrings, String[] prodStrings) {
-
-        List<String> strings = new ArrayList<>();
-        for (int i = 0; i < rxnStrings.length; i++) {
-            if (rxnStrings[i] != null)
-                strings.add(rxnStrings[i]);
-        }
-        for (int i = 0; i < prodStrings.length; i++) {
-            if (rxnStrings[i] != null)
-
-                strings.add(prodStrings[i]);
-        }
-        return strings;
-    }
-
 
     public static IntLists2 indexProducer(String oneElementString) {
         String string = oneElementString;
@@ -75,63 +66,122 @@ public class Main {
         return holder;
     }
 
+    /*
+    Consideration: this method as the polyatomic ion to te beginning of the list instead of at
+    the end. This should be correct when the sort occurs.
+    */
+//    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
+//    Cu + Ag(NO3) --> Ag + Cu(NO3)2
+
+//    THIS FUNCTION IS FUCKED
+
     public static List<String> elementwNumParser(String string, List<Integer> capitalsIndex) {
+        int ind = whereIsPolyatomic(string, polyatomicList);
         List<String> elementwNumList = new ArrayList<>();
 
-        for (int i = 0; i < capitalsIndex.size(); i++) {
-            if (i == capitalsIndex.size() - 1) {
-                elementwNumList.add(string.substring(capitalsIndex.get(i)));
+        if (ind != -1){
+            elementwNumList.add(string.substring(ind));
+            string = string.substring(0, ind);
+            for (int i=capitalsIndex.size()-1; i>-1; i--){
+                if (ind < capitalsIndex.get(i)){
+                    capitalsIndex.remove(i);
+                }
+            }
+        }
+        if (capitalsIndex.size() ==1){
+            if (capitalsIndex.get(0) == 0){
+                elementwNumList.add(string);
             } else {
-                elementwNumList.add(string.substring(capitalsIndex.get(i), capitalsIndex.get(i + 1)));
+//                throw StringIndexOutOfBoundsException;
+                LOG.info("Issue processing and parsing string");
+            }
+        } else {
+
+            for (int i = 0; i < capitalsIndex.size(); i++) {
+                if (i == capitalsIndex.size() - 1) {
+                    elementwNumList.add(string.substring(capitalsIndex.get(i)));
+                } else {
+                    elementwNumList.add(string.substring(capitalsIndex.get(i), capitalsIndex.get(i + 1)));
+                }
             }
         }
         return elementwNumList;
+
     }
 
+//    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
+//    BROKENN!!!!
+    public static List<String> uniqueElement(List<String> moleStrList, String[] rxnArr) {
+
+        List<String> uniqueElements = new ArrayList<>();
+        for (int j = 0; j < rxnArr.length; j++) {
+
+            String string = moleStrList.get(j);
+            List<String> elementwNumList = elementwNumParser(string, indexProducer(string).capitalsIndex);
+
+            for (String elementWnum : elementwNumList){
+                String element = elementInfoOneMole(elementWnum).element;
+                if (!uniqueElements.contains(element)) {
+                    uniqueElements.add(element);
+                }
+            }
+        }
+
+        List<String> polyatomics = new ArrayList<>();
+        for (String s :uniqueElements){
+            String str = "(" + s + ")";
+            int ind = whereIsPolyatomic(str, polyatomicList);
+            if (ind != -1){
+                uniqueElements.remove(s);
+                polyatomics.add(s);
+            }
+        }
+
+        Collections.sort(polyatomics);
+        List<String> uniqueElements2 = new ArrayList<>(polyatomics);
+
+        Collections.sort(uniqueElements);
+        uniqueElements2.addAll(uniqueElements);
+
+        return (uniqueElements2);
+    }
+
+    //    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
     public static StringAndInteger elementInfoOneMole(String elementwNum) {
+//        This passes a single element wihtin a molecule string, for example it would pass O2 or Ca for example
         String string = elementwNum;
-        List<Integer> digitIndex = new ArrayList<>();
-        for (int i = 0; i < string.length(); i++) {
-            if (Character.isDigit(string.charAt(i))) {
-                digitIndex.add(i);
-                break;
+        if (!string.contains("(")) {
+            List<Integer> digitIndex = new ArrayList<>();
+            for (int i = 0; i < string.length(); i++) {
+                if (Character.isDigit(string.charAt(i))) {
+                    digitIndex.add(i);
+                    break;
+                }
             }
-        }
-        if (digitIndex.size() != 0) {
-            String element = string.substring(0, digitIndex.get(0));
-            int elementNum = Integer.valueOf(string.substring(digitIndex.get(0)));
-            StringAndInteger enn = new StringAndInteger(element, elementNum);
-            return enn;
+            if (digitIndex.size() != 0) {
+                String element = string.substring(0, digitIndex.get(0));
+                int elementNum = Integer.valueOf(string.substring(digitIndex.get(0)));
+                StringAndInteger enn = new StringAndInteger(element, elementNum);
+                return enn;
+            } else {
+                String element = string;
+                int elementNum = 1;
+                StringAndInteger enn = new StringAndInteger(element, elementNum);
+                return enn;
+            }
         } else {
-            String element = string;
             int elementNum = 1;
-            StringAndInteger enn = new StringAndInteger(element, elementNum);
+            if (!string.substring(string.lastIndexOf(")")).equals(")")) {
+                elementNum = Integer.parseInt(string.substring(string.lastIndexOf(')') + 1));
+            }
+            String polyatomic = string.substring(string.indexOf('(')+1, string.lastIndexOf(')'));
+            StringAndInteger enn = new StringAndInteger(polyatomic, elementNum);
             return enn;
         }
     }
-
-    public static List<String> concatenatedList(List<List<String>> singleRxnElewNumsList) {
-        List<String> concatinatedList = new ArrayList<>();
-        for (int i = 0; i < singleRxnElewNumsList.size(); i++) {
-            for (int j = 0; j < singleRxnElewNumsList.get(i).size(); j++) {
-                concatinatedList.add(singleRxnElewNumsList.get(i).get(j));
-            }
-        }
-        return concatinatedList;
-    }
-    public static Boolean isUniqueElement (List<StringAndInteger> rankList, StringAndInteger elementInfo) {
-        List<Integer> intList = new ArrayList<>();
-        for (StringAndInteger s : rankList){
-            if(elementInfo.element.equals(s.element)){
-                intList.add(0);
-            }
-        }
-        if (intList.size() == 0){
-            return true;
-        }
-        return false;
-    }
-
+//    Pb(SO4) > 10PBSO3 + 3O2
+//    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
+//    Note: Polyatomic ions are always listed first in the rankLIst
     public static List<List<StringAndInteger>> rankListEachMole(List<String> elementStrings) {
         List<List<StringAndInteger>> rankListEachMole = new ArrayList<>();
 //        String == "C2H6"
@@ -175,6 +225,7 @@ public class Main {
         return zeroPutter;
     }
 
+//    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
     public static double[][] matrix(List<List<StringAndInteger>> rankList) {
 //         3
         int m = rankList.get(0).size();
@@ -188,6 +239,7 @@ public class Main {
                 matrix[i][j] = rankList.get(j).get(i).elementNum;
             }
         }
+
         return matrix;
     }
 
@@ -249,15 +301,24 @@ public class Main {
                 break;
             }
         }
+        for (int i=rawCoefficientList.size()-1; i>-1; i--){
+            if (rawCoefficientList.get(i) == 0){
+                rawCoefficientList.remove(i);
+            }
+
+        }
 //        if count != 0 || null;
         List<Integer> balancedNums = new ArrayList<>();
         for (Double d : rawCoefficientList){
             int balancedInt = Math.abs((int) Math.round(d*lowestPossibleCount));
             balancedNums.add(balancedInt);
         }
+        balancedNums.add(lowestPossibleCount);
+
         return balancedNums;
     }
 
+//        Cu + Ag(NO3) --> Ag + Cu(NO3)2
     public static String balancedEquation(List<String> elementStrings, List<Integer> balancedNumbers){
         int reactantsIndex = 0;
         int count =-1;
@@ -270,7 +331,7 @@ public class Main {
         List<String> rxnElements = new ArrayList<>();
         List<String> prodElements = new ArrayList<>();
         for (int i=0; i<elementStrings.size(); i++ ){
-            if ( i< count){
+            if ( i< count-1){
                 rxnElements.add(elementStrings.get(i));
             } else{
                 prodElements.add(elementStrings.get(i));
@@ -285,15 +346,56 @@ public class Main {
         stringBuilder.delete(stringBuilder.lastIndexOf("+ "), stringBuilder.length());
         stringBuilder.append(" ---> ");
         for (int i=0; i<prodElements.size(); i++) {
-            stringBuilder.append(balancedNumbers.get(i+commonInt) + " " + prodElements.get(i) + " + ");
+            stringBuilder.append(balancedNumbers.get(i+commonInt+1) + " " + prodElements.get(i) + " + ");
         }
         stringBuilder.delete(stringBuilder.lastIndexOf("+ "), stringBuilder.length());
         String balancedEqn = stringBuilder.toString();
         return balancedEqn;
     }
 
-//        C2H6 + O2 --> CO2 + H2O
-//        O2H4 + C2H6 + O2 --> CO2 + H2O
+//        C3H8 + O2 --> CO2 + H2O
+//        CH6 + O2 --> CO2 + H2O
+//        Cu + Ag(NO3) --> Ag + Cu(NO3)2
+//        Al2O3 + Fe --> Fe3O4 + Al
+//        P4O10 + H2O --> H3PO4
+//        Al + H2(SO4) --> Al2(SO4)3 + H2
+
+//WHY CANT IT SOLVE THIS ONE???
+//        Al2(SO3)3 + Na(OH) --> Na2(SO3) + Al(OH)3
+
+
+    /*    ==================================================
+      HELPER FUNCTIONS
+*/
+    public static List<String> elementStrings(String[] rxnStrings, String[] prodStrings) {
+
+        List<String> strings = new ArrayList<>();
+        for (int i = 0; i < rxnStrings.length; i++) {
+            if (rxnStrings[i] != null)
+                strings.add(rxnStrings[i]);
+        }
+        for (int i = 0; i < prodStrings.length; i++) {
+            if (prodStrings[i] != null){
+                strings.add(prodStrings[i]);
+            }
+
+
+        }
+        return strings;
+    }
+
+    public static Boolean isUniqueElement (List<StringAndInteger> rankList, StringAndInteger elementInfo) {
+        List<Integer> intList = new ArrayList<>();
+        for (StringAndInteger s : rankList){
+            if(elementInfo.element.equals(s.element)){
+                intList.add(0);
+            }
+        }
+        if (intList.size() == 0){
+            return true;
+        }
+        return false;
+    }
 
     public static void main(String[] args) {
 //        receiving and splitting data into elements
