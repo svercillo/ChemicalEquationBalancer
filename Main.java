@@ -243,6 +243,26 @@ public class Main {
         return matrix;
     }
 
+
+    private static double[][] solvedMatrix (double[][] matrix){
+        double[][] rref = matrix;
+        int counter =-1;
+//        for each row
+        for (int d =0; d<matrix[0].length; d++){
+//            for each column in each row
+            for (int g=0; g<matrix.length; g++){
+                if (Math.abs(rref[g][d]) > Math.abs(rref[g][d])) {
+
+                }
+            }
+
+
+        }
+
+        return null;
+    }
+
+
     //        C2H6 + O2 --> CO2 + H2O
     private static double[][] rref(double[][] matrix) {
         double[][] rref = new double[matrix.length][];
@@ -252,6 +272,9 @@ public class Main {
         int r = 0;
         for (int c = 0; c < rref[0].length && r < rref.length; c++) {
             int j = r;
+/*            This block until the continue checks if the row below is greater than the row above.
+              If this is true then the row below is taken and it will be processed in the next section.
+ */
             for (int i = r + 1; i < rref.length; i++)
                 if (Math.abs(rref[i][c]) > Math.abs(rref[j][c]))
                     j = i;
