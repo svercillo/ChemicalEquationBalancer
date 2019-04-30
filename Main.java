@@ -17,6 +17,10 @@ public class Main {
 
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
+    private static boolean isInvalid;
+    
+    private static List<Character> barChars = Arrays.asList('!','@','#','%','*','=', '?', '\'', '<', '{', '}');
+
     public static class StringAndInteger {
         public String element;
         public Integer elementNum;
@@ -63,6 +67,8 @@ public class Main {
                 coefficientIndex.add(i);
         }
         IntLists2 holder = new IntLists2(capitalsIndex, coefficientIndex);
+        if (capitalsIndex.isEmpty())
+            isInvalid =  true;
         return holder;
     }
 
@@ -92,7 +98,7 @@ public class Main {
             if (capitalsIndex.get(0) == 0){
                 elementwNumList.add(string);
             } else {
-//                throw StringIndexOutOfBoundsException;
+                isInvalid = true;
                 LOG.info("Issue processing and parsing string");
             }
         } else {
@@ -119,31 +125,18 @@ public class Main {
             String string = moleStrList.get(j);
             List<String> elementwNumList = elementwNumParser(string, indexProducer(string).capitalsIndex);
 
-            for (String elementWnum : elementwNumList){
+            for (String elementWnum : elementwNumList) {
                 String element = elementInfoOneMole(elementWnum).element;
                 if (!uniqueElements.contains(element)) {
                     uniqueElements.add(element);
                 }
             }
         }
-
-        List<String> polyatomics = new ArrayList<>();
-        for (String s :uniqueElements){
-            String str = "(" + s + ")";
-            int ind = whereIsPolyatomic(str, polyatomicList);
-            if (ind != -1){
-                uniqueElements.remove(s);
-                polyatomics.add(s);
-            }
+        if (uniqueElements.isEmpty()){
+            isInvalid = true;
         }
 
-        Collections.sort(polyatomics);
-        List<String> uniqueElements2 = new ArrayList<>(polyatomics);
-
-        Collections.sort(uniqueElements);
-        uniqueElements2.addAll(uniqueElements);
-
-        return (uniqueElements2);
+        return (uniqueElements);
     }
 
     //    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
@@ -179,7 +172,7 @@ public class Main {
             return enn;
         }
     }
-    //    Pb(SO4) > 10PBSO3 + 3O2
+//    Pb(SO4) > 10PBSO3 + 3O2
 //    BaCl2 + Al2(SO4)3 --> Ba(SO4)3 + AlCl3
 //    Note: Polyatomic ions are always listed first in the rankLIst
     public static List<List<StringAndInteger>> rankListEachMole(List<String> elementStrings) {
@@ -243,61 +236,91 @@ public class Main {
         return matrix;
     }
 
+    private static List<double[][]> rrefList = new ArrayList<>();
 
-    private static double[][] solvedMatrix (double[][] matrix){
-        double[][] rref = matrix;
-        int counter =-1;
-//        for each row
-        for (int d =0; d<matrix[0].length; d++){
-//            for each column in each row
-            for (int g=0; g<matrix.length; g++){
-                if (Math.abs(rref[g][d]) > Math.abs(rref[g][d])) {
-
-                }
-            }
-
-
-        }
-
-        return null;
+    private static boolean isUnique (double[][] rref){
+        Set<double[][]> rrefSet = new HashSet<>(rrefList);
+        return rrefSet.size() == rrefList.size();
     }
-
-
     //        C2H6 + O2 --> CO2 + H2O
     private static double[][] rref(double[][] matrix) {
-        double[][] rref = new double[matrix.length][];
-        for (int i = 0; i < matrix.length; i++)
-            rref[i] = Arrays.copyOf(matrix[i], matrix[i].length);
-
-        int r = 0;
-        for (int c = 0; c < rref[0].length && r < rref.length; c++) {
-            int j = r;
-/*            This block until the continue checks if the row below is greater than the row above.
-              If this is true then the row below is taken and it will be processed in the next section.
- */
-            for (int i = r + 1; i < rref.length; i++)
-                if (Math.abs(rref[i][c]) > Math.abs(rref[j][c]))
-                    j = i;
-            if (Math.abs(rref[j][c]) < 0.00001)
-                continue;
-
-            double[] temp = rref[j];
-            rref[j] = rref[r];
-            rref[r] = temp;
-
-            double s = 1.0 / rref[r][c];
-            for (j = 0; j < rref[0].length; j++)
-                rref[r][j] *= s;
-            for (int i = 0; i < rref.length; i++) {
-                if (i != r) {
-                    double t = rref[i][c];
-                    for (j = 0; j < rref[0].length; j++)
-                        rref[i][j] -= t * rref[r][j];
-                }
-            }
-            r++;
+        double[][] rref = matrix;
+        Set<double[][]> rrefSet = new HashSet<>(rrefList);
+        while (isUnique(rref)){
+            rref = rowReducer(rref);
         }
         return rref;
+    }
+
+    private static Map<int[], Double> pivotMapper(double[][] matrix) {
+        double[][] rref = matrix;
+        List<Integer> pivotRows = new ArrayList<>();
+
+//        key for hashmap will be the column # and the value will be the pivot value
+        Map<int[], Double> pivotMap = new HashMap<>();
+        for (int t = 0; t < rref[0].length; t++) {
+            double pivot = -1;
+            int pivotRow = 0;
+            for (int s = 0; s < rref.length; s++) {
+                double st = rref[s][t];
+//                there can only be one pivot per column
+                if (st != 0 && pivot == -1 && !pivotRows.contains(s)) {
+                    pivot = rref[s][t];
+                    pivotRows.add(s);
+                    int[] array = new int[]{s, t};
+                    pivotMap.put(array, pivot);
+                }
+            }
+        }
+        pivotMap = mapSorter(pivotMap);
+        return pivotMap;
+
+    }
+
+    private static double[][] rowReducer(double[][] matrix) {
+        double[][] rref = matrix;
+        Map<int[], Double> pivotMap = (pivotMapper(rref));
+
+        for (Map.Entry<int[], Double> entry : pivotMap.entrySet()) {
+            boolean isChanged = false;
+            double pivot = entry.getValue();
+            int i = entry.getKey()[0];
+            int j = entry.getKey()[1];
+            double[] pivotRow = rref[i];
+
+            for (int s = 0; s < rref.length; s++) {
+                double mul = -(rref[s][j]/ pivot);
+                if (rref[s][j] != 0 && s != i){
+                    for (int t=0; t<rref[0].length; t++){
+                        double d = rref[s][j];
+                        rref[s][t] = rref[s][t] + mul * rref[i][t];
+                        isChanged =true;
+                    }
+                }
+            }
+            if (isChanged)
+                break;
+
+        }
+        rrefList.add(rref);
+        return rref;
+    }
+
+    private static Map<int[], Double> mapSorter(Map<int[], Double> pivotMap) {
+        Map<int[], Double> hashMap = new LinkedHashMap<>();
+        List<Map.Entry<int[], Double>> entryList = new ArrayList<>(pivotMap.entrySet());
+
+        Collections.sort(entryList, new Comparator<Map.Entry<int[], Double>>() {
+            @Override
+            public int compare(Map.Entry<int[], Double> o1, Map.Entry<int[], Double> o2) {
+                return o1.getKey()[1] - o2.getKey()[1];
+            }
+        });
+
+        for (Map.Entry<int[], Double> e : entryList){
+            hashMap.put(e.getKey(), e.getValue());
+        }
+        return hashMap;
     }
 
     public static List<Integer> balancedNumbers (double[][] rref, List<String> uniqueElements, String[] rxnStrings, String[] prodStrings) {
@@ -377,6 +400,7 @@ public class Main {
     }
 
 //        C3H8 + O2 --> CO2 + H2O
+//        C2H6 + O2 --> CO2 + H2O
 //        CH6 + O2 --> CO2 + H2O
 //        Cu + Ag(NO3) --> Ag + Cu(NO3)2
 //        Al2O3 + Fe --> Fe3O4 + Al
@@ -423,43 +447,37 @@ public class Main {
     public static void main(String[] args) {
 //        receiving and splitting data into elements
         Scanner scanner = new Scanner(System.in);
-        String whole = scanner.nextLine();
-        String[] eqnSplitter = whole.split(" --> ");
-        String[] rxnStrings = eqnSplitter[0].split(" \\+ ");
-        String[] prodStrings = eqnSplitter[1].split(" \\+ ");
-        List<String> elementStrings = elementStrings(rxnStrings, prodStrings);
-        List<String> uniqueElements = uniqueElement(elementStrings, rxnStrings);
-        List<List<StringAndInteger>> rankListEachMole = rankListEachMole(elementStrings);
-        List<List<StringAndInteger>> rankList = new ArrayList<>();
-        for (List<StringAndInteger> siList : rankListEachMole){
-            rankList.add(zeroPutter(siList, uniqueElements));
+        String whole = scanner.nextLine().trim();
+//        If the string doesn't start with a valid uppercase
+        if (whole.charAt(0) != Character.toUpperCase(whole.charAt(0))) {
+            isInvalid = true;
         }
-        double[][] rref = rref(matrix(rankList));
+//        if the string contains an invalid character 
+        for (char c : whole.toCharArray()){
+            if (barChars.contains(c)){
+                isInvalid = true;
+            }
+        }
+        if (isInvalid){
+//            Do something bad here
+        } else {
 
-        List<Integer> balancedEquation = balancedNumbers(rref,uniqueElements,rxnStrings,prodStrings);
-        String s = balancedEquation(elementStrings, balancedEquation);
-        System.out.println(s);
+
+            String[] eqnSplitter = whole.split(" --> ");
+            String[] rxnStrings = eqnSplitter[0].split(" \\+ ");
+            String[] prodStrings = eqnSplitter[1].split(" \\+ ");
+            List<String> elementStrings = elementStrings(rxnStrings, prodStrings);
+            List<String> uniqueElements = uniqueElement(elementStrings, rxnStrings);
+            List<List<StringAndInteger>> rankListEachMole = rankListEachMole(elementStrings);
+            List<List<StringAndInteger>> rankList = new ArrayList<>();
+            for (List<StringAndInteger> siList : rankListEachMole) {
+                rankList.add(zeroPutter(siList, uniqueElements));
+            }
+            double[][] rref = rref(matrix(rankList));
+
+            List<Integer> balancedEquation = balancedNumbers(rref, uniqueElements, rxnStrings, prodStrings);
+            String s = balancedEquation(elementStrings, balancedEquation);
+            System.out.println(s);
+        }
     }
 }
-
-//            List<StringAndInteger> rankListHolder = new ArrayList<>();
-//            Map<String, StringAndInteger> map = new HashMap<>();
-//            for (int i=0; i<uniqueElements.size(); i++) {
-//                for (String s : singleRxnElewNums) {
-////                StringAndInteger elementInfo = elementInfoOneMole(s);
-////                    if (elementInfo.element.equals(uniqueElements.get(i)) && isUniqueElement(rankListHolder, elementInfo)) {
-////                        rankListHolder.add(elementInfo);
-////                        map.put(elementInfo.element, elementInfo);
-////                    }
-//                }
-//            }
-//            List<StringAndInteger> rankList = new ArrayList<>();
-//            for (int i=0; i<uniqueElements.size(); i++){
-//                if(map.keySet().contains(uniqueElements.get(i))){
-//                    StringAndInteger sAndI = map.get(i);
-//                    rankList.add(i,sAndI);
-//                }
-//                StringAndInteger si = new StringAndInteger(uniqueElements.get(i), 0);
-//                rankList.add(si);
-//            }
-//            rankListEachMole.add(rankListHolder);
